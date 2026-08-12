@@ -32,6 +32,9 @@ export class Controls {
     });
 
     this.#bindEvents();
+
+    // 停止ボタンは再生中のみ有効。
+    this.setPlayingState(false);
   }
 
   // ================================================================
