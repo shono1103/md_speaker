@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      # ビルドと同時に userscript メタデータ (@grant / @connect / @version) を検証する
+      - name: Build
+        run: pnpm build
+
+      - name: Upload userscript
+        uses: actions/upload-artifact@v4
+        with:
+          name: md-speaker-userscript
+          path: |
+            dist/md-speaker.user.js
+            dist/md-speaker.meta.js
+          if-no-files-found: error

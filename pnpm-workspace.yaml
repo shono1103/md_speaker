@@ -1,0 +1,4 @@
+# esbuild (vite の依存) のみ postinstall を許可する。
+# CI で pnpm approve-builds を対話実行しないよう、ここで明示しておく。
+allowBuilds:
+  esbuild: true

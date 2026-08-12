@@ -1,0 +1,88 @@
+/*
+ * パネルのスタイル。
+ *
+ * mdts 側の CSS と衝突しないよう、全て .mdts-aivis- 接頭辞で閉じる。
+ * .markdown-body の外に置くので読み上げ対象にはならない。
+ */
+
+.mdts-aivis-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 999999;
+  box-sizing: border-box;
+  width: 310px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(25, 25, 25, 0.96);
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.mdts-aivis-panel * {
+  box-sizing: border-box;
+}
+
+.mdts-aivis-title {
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.mdts-aivis-label {
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.mdts-aivis-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.mdts-aivis-panel select,
+.mdts-aivis-panel input[type='range'] {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.mdts-aivis-heading-info {
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+.mdts-aivis-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.mdts-aivis-panel button {
+  cursor: pointer;
+  padding: 7px;
+}
+
+.mdts-aivis-panel button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.mdts-aivis-controls button {
+  flex: 1;
+}
+
+.mdts-aivis-refresh {
+  width: 100%;
+  margin-top: 7px;
+  padding: 6px;
+}
+
+.mdts-aivis-status {
+  margin-top: 9px;
+  font-size: 11px;
+  opacity: 0.78;
+  overflow-wrap: anywhere;
+}
