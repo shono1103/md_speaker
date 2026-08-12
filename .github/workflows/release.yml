@@ -14,9 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # バージョンは package.json の packageManager から読ませる。
+      # version 入力と併記すると action がエラーになる。
       - uses: pnpm/action-setup@v4
-        with:
-          version: 11
 
       - uses: actions/setup-node@v4
         with:
