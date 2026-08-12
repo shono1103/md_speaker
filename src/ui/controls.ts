@@ -1,6 +1,7 @@
 import type { AivisClient } from '../aivis/client';
 import { ROOT_SELECTOR, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN } from '../config';
 import { getReadableRoot } from '../dom/root';
+import { scrollToElement } from '../dom/scroll';
 import type { Storage } from '../infra/storage';
 import { formatHeadingLabel, HeadingIndex } from '../model/headings';
 import { TOP_KEY } from '../model/unit';
@@ -209,7 +210,9 @@ export class Controls {
     // ユーザーがプルダウンで指定した位置を先に確保しておく。
     const requestedStartKey = this.ui.headingSelect.value || TOP_KEY;
 
-    if (!getReadableRoot()) {
+    const root = getReadableRoot();
+
+    if (!root) {
       this.setStatus(NOT_FOUND_MESSAGE);
       return;
     }
@@ -221,6 +224,9 @@ export class Controls {
     const startKey = this.ui.headingSelect.value || TOP_KEY;
 
     this.storage.setHeading(startKey);
+
+    // 読み上げ位置を画面に出す。「先頭から」なら本文先頭へ。
+    scrollToElement(this.#headings.findByKey(startKey)?.element ?? root);
 
     await this.#reader.speak({
       startKey,

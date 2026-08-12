@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AivisClient } from '../src/aivis/client';
+import { SCROLL_OFFSET } from '../src/config';
 import type { HttpClient } from '../src/infra/http';
 import { storage } from '../src/infra/storage';
 import { TOP_KEY } from '../src/model/unit';
@@ -211,6 +212,52 @@ describe('Controls', () => {
 
     expect(ui.statusElement.textContent).toBe('停止 / 次回: 3. 使い方');
     expect(storage.getHeading()).toBe('H2:使い方:2');
+  });
+
+  it('読み上げ開始で選択した見出しへスクロールする', async () => {
+    const scrollTo = vi.fn();
+
+    window.scrollTo = scrollTo;
+
+    const { ui, controls } = setup();
+
+    await controls.loadSpeakers();
+    controls.refreshHeadings();
+
+    ui.headingSelect.value = 'H2:使い方:1';
+
+    const heading = controls.headings.findByKey('H2:使い方:1')!.element;
+
+    heading.getBoundingClientRect = () => ({ top: 640, bottom: 660, height: 20 }) as DOMRect;
+
+    ui.playButton.click();
+
+    await vi.waitFor(() => expect(scrollTo).toHaveBeenCalled());
+
+    expect(scrollTo).toHaveBeenCalledWith({ top: 640 - SCROLL_OFFSET, behavior: 'smooth' });
+  });
+
+  it('「先頭から」なら本文の先頭へスクロールする', async () => {
+    const scrollTo = vi.fn();
+
+    window.scrollTo = scrollTo;
+
+    const { ui, controls } = setup();
+
+    await controls.loadSpeakers();
+    controls.refreshHeadings();
+
+    ui.headingSelect.value = TOP_KEY;
+
+    const root = document.querySelector<HTMLElement>('.markdown-body')!;
+
+    root.getBoundingClientRect = () => ({ top: 120, bottom: 900, height: 780 }) as DOMRect;
+
+    ui.playButton.click();
+
+    await vi.waitFor(() => expect(scrollTo).toHaveBeenCalled());
+
+    expect(scrollTo).toHaveBeenCalledWith({ top: 120 - SCROLL_OFFSET, behavior: 'smooth' });
   });
 
   it('パネルは .markdown-body の外に置かれる', () => {

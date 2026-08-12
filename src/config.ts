@@ -22,6 +22,16 @@ export const AIVIS_URL = 'http://127.0.0.1:10101';
  */
 export const MAX_UNIT_LENGTH = 180;
 
+/**
+ * 読み上げ開始時のスクロール挙動。
+ *
+ * 即座に移動させたい場合は 'auto' にする。
+ */
+export const SCROLL_BEHAVIOR: ScrollBehavior = 'smooth';
+
+/** スクロール先と画面上端との余白 (px)。 */
+export const SCROLL_OFFSET = 48;
+
 /** 速度スライダーの範囲。 */
 export const SPEED_MIN = 0.7;
 export const SPEED_MAX = 2.0;

@@ -100,10 +100,26 @@ jsdom は `innerText` を実装していないため、`happy-dom` を使って�
 それでも `innerText` の改行整形は実機と完全には一致しないため、
 `dom/extract.ts` の挙動は最終的に mdts 上での実機確認で担保します。
 
+## スクロールの実装方針
+
+mdts は三分割レイアウトで、本文が内側のペインをスクロールします。
+`window.scrollTo` だけでは動かないため、
+`dom/scroll.ts` が縦スクロール可能な最も近い祖先を探し、
+見つかればそのペイン、無ければ `window` をスクロールします。
+
+呼び出すのは `ui/controls.ts` のみです。
+`player` 層はスクロールを知りません（読み上げ位置の管理と表示位置は別の関心事）。
+
 ## 今後の拡張余地
 
 構成上入れやすいが、現時点では持っていないもの。
 
+- **技術用語辞書** — `OIDC` / `MCP` / `RAG` / `PostgreSQL` / `Kubernetes` などの読み方補正。
+  `text/normalize.ts` の前段に置ける
+- **現在位置への自動追従スクロール** — 現在は読み上げ開始時のみジャンプする。
+  `Reader` の `onSectionChange` を使えば追従できる
+- **一時停止 / 再開** — 現在の停止は読み上げ処理そのものを終了する。
+  `Playback` に pause/resume を足し、`Reader` の generator を保持すればプレイヤー形式にできる
 - `.markdown-body` への `MutationObserver`（mdts のライブリロード時に見出しを自動更新。現在は手動ボタン）
 - パネルの Shadow DOM 化（mdts のテーマ CSS との干渉を完全に排除）
 - `AIVIS_URL` / `MDTS_PORT` の UI 設定化（`AIVIS_URL` のホストを変える場合は `@connect` も要変更）
