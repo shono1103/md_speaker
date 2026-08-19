@@ -1,5 +1,6 @@
 import { AivisClient } from './aivis/client';
-import { MDTS_PORT, ROOT_SELECTOR } from './config';
+import { ROOT_SELECTOR } from './config';
+import { isMdtsPage } from './dom/mdts';
 import { getReadableRoot } from './dom/root';
 import { gmHttpClient } from './infra/http';
 import { storage } from './infra/storage';
@@ -43,6 +44,6 @@ async function main(): Promise<void> {
   }
 }
 
-if (location.port === MDTS_PORT) {
+if (isMdtsPage()) {
   void main();
 }

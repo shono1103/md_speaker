@@ -4,8 +4,33 @@
  * ここ以外に定数を散らさない。
  */
 
-/** mdts が listen しているポート。これ以外のページでは何もしない。 */
-export const MDTS_PORT = '8521';
+/**
+ * mdts のページと判定するための目印。
+ *
+ * 重要:
+ *   ポート番号では判定しない。
+ *   mdts は `--port` でも変わるし、既定の 8521 が使用中なら
+ *   自動で次のポートへずれるため。
+ */
+
+/**
+ * mdts の index.html の <title>。
+ *
+ * mdts のフロントエンドは title を書き換えないので、
+ * どのファイルを開いていてもこれが残る。
+ */
+export const MDTS_TITLE_PATTERN = /\bmdts\b/i;
+
+/**
+ * title が変わったときの予備判定。mdts が配信する index.html の骨格。
+ *
+ * 個々の目印はありふれているため、すべて揃ったときだけ mdts と見なす。
+ */
+export const MDTS_SHELL_SELECTORS = [
+  'link[rel="stylesheet"][href$="markdown.css"]',
+  'script[src$="bundle.js"]',
+  '#root',
+];
 
 /**
  * 読み上げ対象はこれだけ。

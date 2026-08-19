@@ -44,9 +44,14 @@ npx mdts ./docs
 
 `http://localhost:8521` が開きます。ファイルを保存すると自動でリロードされます。
 
-> **注意**: このスクリプトはポート **8521**（mdts の既定ポート）でのみ動作します。
-> `npx mdts --port 8000` のように変えている場合は、
-> `src/config.ts` の `MDTS_PORT` を合わせて変更し、ビルドし直してください。
+ポート番号は問いません。`npx mdts --port 8000` のような指定でも、
+既定ポートが使用中で mdts が自動的に次のポートへずらした場合でも動作します。
+「mdts が配信しているページか」を DOM から判定しているためです
+（`<title>` に mdts を含むか、mdts の index.html の骨格が揃っているか）。
+
+> **注意**: userscript の `@match` は `http://localhost/*` と `http://127.0.0.1/*` です。
+> それ以外のホスト名（別マシンの mdts など）で開く場合は、
+> Tampermonkey のエディタでそのホストの `@match` を足してください。
 
 ### 2. AivisSpeech を起動する
 
@@ -104,7 +109,7 @@ mdts のページを開くと、右下にパネルが出ます。
 
 | 定数              | 既定                     | 意味                                                               |
 | ----------------- | ------------------------ | ------------------------------------------------------------------ |
-| `MDTS_PORT`       | `'8521'`                 | このポート以外では何もしない                                       |
+| `ROOT_SELECTOR`   | `.markdown-body`         | 読み上げ対象。ここ以外は読まない                                   |
 | `AIVIS_URL`       | `http://127.0.0.1:10101` | AivisSpeech Engine（変更時は `@connect` も要変更）                 |
 | `MAX_UNIT_LENGTH` | `180`                    | 1 チャンクの最大文字数。小さいほど初速が速く、リクエスト数は増える |
 | `SCROLL_BEHAVIOR` | `'smooth'`               | `'auto'` にすると即座に移動                                        |
@@ -134,11 +139,11 @@ Tampermonkey のエディタに `dist/md-speaker.user.js` の内容を貼るの�
 ```
 src/
   main.ts        起動ガードと組み立てのみ
-  config.ts      ポート・URL・分割長などの定数
+  config.ts      mdts の判定条件・URL・分割長などの定数
   infra/         GM_xmlhttpRequest ラッパ / localStorage
   aivis/         AivisSpeech クライアント (audio_query → synthesis)
   text/          正規化と音声単位への分割
-  dom/           .markdown-body の特定・テキスト抽出・スクロール
+  dom/           mdts ページ判定・.markdown-body の特定・テキスト抽出・スクロール
   model/         見出し索引と読み上げ単位の generator
   player/        Audio 再生と疑似ストリーミング制御
   ui/            パネル DOM と配線（DOM を触るのはここだけ）

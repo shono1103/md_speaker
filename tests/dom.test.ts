@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getElementText, getTableCellText } from '../src/dom/extract';
+import { isMdtsPage } from '../src/dom/mdts';
 import { getReadableRoot } from '../src/dom/root';
 
 function first<T extends HTMLElement>(html: string, selector: string): T {
@@ -76,5 +77,59 @@ describe('getTableCellText', () => {
     );
 
     expect(getTableCellText(cell)).toBe('値');
+  });
+});
+
+describe('isMdtsPage', () => {
+  /** mdts が配信する index.html の head（ポートは URL 側の話なので出てこない）。 */
+  const MDTS_HEAD = `
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/markdown.css" />
+    <script defer src="/bundle.js"></script>
+  `;
+
+  /**
+   * 判定が使うのは title と querySelector だけ。
+   *
+   * 実 Document へ <link> / <script> を挿すと happy-dom が
+   * 実際に取得しようとするため、切り離した要素で代用する。
+   */
+  function page(title: string, ...html: string[]): Document {
+    const shell = document.createElement('div');
+
+    shell.innerHTML = html.join('');
+
+    return {
+      title,
+      querySelector: (selector: string) => shell.querySelector(selector),
+    } as unknown as Document;
+  }
+
+  it('mdts のページなら true（ポートを見ていない）', () => {
+    const doc = page('mdts - Markdown file viewer', MDTS_HEAD, '<div id="root"></div>');
+
+    expect(isMdtsPage(doc)).toBe(true);
+  });
+
+  it('title だけでも mdts と判定する', () => {
+    expect(isMdtsPage(page('mdts - Markdown file viewer'))).toBe(true);
+  });
+
+  it('title が書き換わっても骨格が揃っていれば true', () => {
+    const doc = page('docs/DESIGN.md', MDTS_HEAD, '<div id="root"></div>');
+
+    expect(isMdtsPage(doc)).toBe(true);
+  });
+
+  it('よくあるローカル SPA（#root + bundle.js のみ）は false', () => {
+    const doc = page('My App', '<script defer src="/bundle.js"></script>', '<div id="root"></div>');
+
+    expect(isMdtsPage(doc)).toBe(false);
+  });
+
+  it('無関係なページは false', () => {
+    const doc = page('Some Local Server', '<div class="markdown-body"><p>読まない</p></div>');
+
+    expect(isMdtsPage(doc)).toBe(false);
   });
 });

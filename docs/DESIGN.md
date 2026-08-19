@@ -100,6 +100,28 @@ jsdom は `innerText` を実装していないため、`happy-dom` を使って�
 それでも `innerText` の改行整形は実機と完全には一致しないため、
 `dom/extract.ts` の挙動は最終的に mdts 上での実機確認で担保します。
 
+## mdts ページの判定
+
+起動ガード (`main.ts`) はポート番号を見ません。
+mdts の既定ポート 8521 は `--port` で変えられるうえ、
+使用中なら mdts 自身が次のポートへずらして listen します。
+「8521 なら mdts」は成立しません。
+
+代わりに `dom/mdts.ts` が「mdts が配信しているページか」を DOM から判定します。
+
+1. `<title>` に `mdts` を含む → それだけで mdts と確定
+   （mdts のフロントエンドは title を書き換えないため、どのファイルを開いていても残る）
+2. そうでなければ、index.html の骨格
+   （`/markdown.css` / `/bundle.js` / `#root`）が **すべて** 揃ったときだけ mdts と見なす
+
+2 を「すべて」にしているのは、目印が単独ではありふれていて
+他のローカル開発サーバーにも一致してしまうためです
+（無関係なページにパネルが出ると邪魔になる）。
+
+判定に `.markdown-body` の有無は使えません。
+mdts は SPA で本文を API 取得後に描画するため、
+`document-idle` の時点では存在しないことがあります。
+
 ## スクロールの実装方針
 
 mdts は三分割レイアウトで、本文が内側のペインをスクロールします。
@@ -122,4 +144,4 @@ mdts は三分割レイアウトで、本文が内側のペインをスクロー
   `Playback` に pause/resume を足し、`Reader` の generator を保持すればプレイヤー形式にできる
 - `.markdown-body` への `MutationObserver`（mdts のライブリロード時に見出しを自動更新。現在は手動ボタン）
 - パネルの Shadow DOM 化（mdts のテーマ CSS との干渉を完全に排除）
-- `AIVIS_URL` / `MDTS_PORT` の UI 設定化（`AIVIS_URL` のホストを変える場合は `@connect` も要変更）
+- `AIVIS_URL` の UI 設定化（ホストを変える場合は `@connect` も要変更）
