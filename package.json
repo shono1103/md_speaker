@@ -1,6 +1,6 @@
 {
   "name": "md-speaker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
   "description": "Read only mdts .markdown-body with AivisSpeech from a selected heading",
